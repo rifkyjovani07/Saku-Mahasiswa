@@ -1,150 +1,420 @@
 package com.mycompany.sakumahasiswa;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Locale;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
-public class App {
-    public static void main(String[] args) {
+public class App extends Application {
 
-        Scanner input = new Scanner(System.in);
+    ArrayList<Transaksi> transaksi = new ArrayList<>();
 
-        ArrayList<Transaksi> transaksi = new ArrayList<>();
+    TextField inputNominal = new TextField();
+    DatePicker inputTanggal = new DatePicker();
+    TextField inputKeterangan = new TextField();
 
-        int pilihan;
+    Label labelSaldo = new Label("Saldo: Rp0");
 
-        do {
-            System.out.println();
-            System.out.println("=== SAKU MAHASISWA ===");
-            System.out.println("1. Tambah Pemasukan");
-            System.out.println("2. Tambah Pengeluaran");
-            System.out.println("3. Lihat Saldo");
-            System.out.println("4. Lihat Transaksi");
-            System.out.println("5. Keluar");
-            System.out.print("Pilih menu: ");
+    @Override
+    public void start(Stage stage) {
 
-            pilihan = input.nextInt();
+        // ==========================
+        // KOMPONEN FORM
+        // ==========================
 
-            switch (pilihan) {
+        Label judul = new Label("SAKU MAHASISWA");
 
-                case 1:
-                    System.out.println();
-                    System.out.println("--- TAMBAH PEMASUKAN ---");
+        Label labelNominal = new Label("Nominal:");
+        Label labelTanggal = new Label("Tanggal:");
+        Label labelKeterangan = new Label("Keterangan:");
 
-                    System.out.print("Nominal: ");
-                    double nominalPemasukan = input.nextDouble();
+        inputNominal.setPromptText("Contoh: 500000");
+        inputTanggal.setPromptText("Pilih tanggal");
+        inputKeterangan.setPromptText("Contoh: Uang dari orang tua");
 
-                    input.nextLine();
+        Button tombolPemasukan =
+                new Button("Tambah Pemasukan");
 
-                    System.out.print("Tanggal: ");
-                    String tanggalPemasukan = input.nextLine();
+        Button tombolPengeluaran =
+                new Button("Tambah Pengeluaran");
 
-                    System.out.print("Keterangan: ");
-                    String keteranganPemasukan = input.nextLine();
+        Button tombolSaldo =
+                new Button("Lihat Saldo");
 
-                    Pemasukan pemasukan = new Pemasukan(
-                            nominalPemasukan,
-                            tanggalPemasukan,
-                            keteranganPemasukan
-                    );
+        Button tombolTransaksi =
+                new Button("Lihat Transaksi");
 
-                    transaksi.add(pemasukan);
+        // ==========================
+        // TAMBAH PEMASUKAN
+        // ==========================
 
-                    System.out.println();
-                    System.out.println("Pemasukan berhasil ditambahkan.");
+        tombolPemasukan.setOnAction(e -> {
 
-                    break;
+            String nominalText =
+                    inputNominal.getText().trim();
 
-                case 2:
-                    System.out.println();
-                    System.out.println("--- TAMBAH PENGELUARAN ---");
+            String keterangan =
+                    inputKeterangan.getText().trim();
 
-                    System.out.print("Nominal: ");
-                    double nominalPengeluaran = input.nextDouble();
+            if (nominalText.isEmpty()
+                    || inputTanggal.getValue() == null
+                    || keterangan.isEmpty()) {
 
-                    input.nextLine();
+                tampilkanAlert(
+                        AlertType.WARNING,
+                        "Peringatan",
+                        "Semua data harus diisi."
+                );
 
-                    System.out.print("Tanggal: ");
-                    String tanggalPengeluaran = input.nextLine();
-
-                    System.out.print("Keterangan: ");
-                    String keteranganPengeluaran = input.nextLine();
-
-                    Pengeluaran pengeluaran = new Pengeluaran(
-                            nominalPengeluaran,
-                            tanggalPengeluaran,
-                            keteranganPengeluaran
-                    );
-
-                    transaksi.add(pengeluaran);
-
-                    System.out.println();
-                    System.out.println("Pengeluaran berhasil ditambahkan.");
-
-                    break;
-
-                case 3:
-                    double totalPemasukan = 0;
-                    double totalPengeluaran = 0;
-
-                    for (Transaksi t : transaksi) {
-
-                        if (t instanceof Pemasukan) {
-                            totalPemasukan += t.getNominal();
-                        } else if (t instanceof Pengeluaran) {
-                            totalPengeluaran += t.getNominal();
-                        }
-                    }
-
-                    double saldo = totalPemasukan - totalPengeluaran;
-
-                    System.out.println();
-                    System.out.println("--- SALDO ---");
-                    System.out.println("Total Pemasukan  : Rp" + totalPemasukan);
-                    System.out.println("Total Pengeluaran: Rp" + totalPengeluaran);
-                    System.out.println("Saldo            : Rp" + saldo);
-
-                    break;
-
-                case 4:
-                    System.out.println();
-                    System.out.println("--- DAFTAR TRANSAKSI ---");
-
-                    if (transaksi.isEmpty()) {
-                        System.out.println("Belum ada transaksi.");
-                    } else {
-
-                        for (Transaksi t : transaksi) {
-
-                            System.out.println("-------------------------");
-
-                            if (t instanceof Pemasukan) {
-                                System.out.println("Jenis      : Pemasukan");
-                            } else if (t instanceof Pengeluaran) {
-                                System.out.println("Jenis      : Pengeluaran");
-                            }
-
-                            System.out.println("Nominal    : Rp" + t.getNominal());
-                            System.out.println("Tanggal    : " + t.getTanggal());
-                            System.out.println("Keterangan : " + t.getKeterangan());
-                        }
-
-                        System.out.println("-------------------------");
-                    }
-
-                    break;
-
-                case 5:
-                    System.out.println();
-                    System.out.println("Terima kasih, sampai jumpa lagi.");
-                    break;
-
-                default:
-                    System.out.println();
-                    System.out.println("Pilihan tidak tersedia.");
+                return;
             }
 
-        } while (pilihan != 5);
+            try {
 
-        input.close();
+                double nominal =
+                        Double.parseDouble(nominalText);
+
+                if (nominal <= 0) {
+
+                    tampilkanAlert(
+                            AlertType.WARNING,
+                            "Input Tidak Valid",
+                            "Nominal harus lebih dari 0."
+                    );
+
+                    return;
+                }
+
+                Pemasukan pemasukan =
+                        new Pemasukan(
+                                nominal,
+                                inputTanggal.getValue().toString(),
+                                keterangan
+                        );
+
+                transaksi.add(pemasukan);
+
+                updateSaldo();
+                kosongkanInput();
+
+                tampilkanAlert(
+                        AlertType.INFORMATION,
+                        "Berhasil",
+                        "Pemasukan berhasil ditambahkan."
+                );
+
+            } catch (NumberFormatException ex) {
+
+                tampilkanAlert(
+                        AlertType.ERROR,
+                        "Kesalahan Format",
+                        "Nominal harus berupa angka."
+                );
+            }
+        });
+
+        // ==========================
+        // TAMBAH PENGELUARAN
+        // ==========================
+
+        tombolPengeluaran.setOnAction(e -> {
+
+            String nominalText =
+                    inputNominal.getText().trim();
+
+            String keterangan =
+                    inputKeterangan.getText().trim();
+
+            if (nominalText.isEmpty()
+                    || inputTanggal.getValue() == null
+                    || keterangan.isEmpty()) {
+
+                tampilkanAlert(
+                        AlertType.WARNING,
+                        "Peringatan",
+                        "Semua data harus diisi."
+                );
+
+                return;
+            }
+
+            try {
+
+                double nominal =
+                        Double.parseDouble(nominalText);
+
+                if (nominal <= 0) {
+
+                    tampilkanAlert(
+                            AlertType.WARNING,
+                            "Input Tidak Valid",
+                            "Nominal harus lebih dari 0."
+                    );
+
+                    return;
+                }
+
+                double saldo = hitungSaldo();
+
+                if (nominal > saldo) {
+
+                    tampilkanAlert(
+                            AlertType.WARNING,
+                            "Saldo Tidak Cukup",
+                            "Saldo tidak mencukupi."
+                    );
+
+                    return;
+                }
+
+                Pengeluaran pengeluaran =
+                        new Pengeluaran(
+                                nominal,
+                                inputTanggal.getValue().toString(),
+                                keterangan
+                        );
+
+                transaksi.add(pengeluaran);
+
+                updateSaldo();
+                kosongkanInput();
+
+                tampilkanAlert(
+                        AlertType.INFORMATION,
+                        "Berhasil",
+                        "Pengeluaran berhasil ditambahkan."
+                );
+
+            } catch (NumberFormatException ex) {
+
+                tampilkanAlert(
+                        AlertType.ERROR,
+                        "Kesalahan Format",
+                        "Nominal harus berupa angka."
+                );
+            }
+        });
+
+        // ==========================
+        // LIHAT SALDO
+        // ==========================
+
+        tombolSaldo.setOnAction(e -> {
+
+            double pemasukan = 0;
+            double pengeluaran = 0;
+
+            for (Transaksi t : transaksi) {
+
+                if (t instanceof Pemasukan) {
+                    pemasukan += t.getNominal();
+                } else {
+                    pengeluaran += t.getNominal();
+                }
+            }
+
+            tampilkanAlert(
+                    AlertType.INFORMATION,
+                    "Saldo",
+                    "Total Pemasukan  : "
+                    + formatRupiah(pemasukan)
+                    + "\nTotal Pengeluaran: "
+                    + formatRupiah(pengeluaran)
+                    + "\nSaldo            : "
+                    + formatRupiah(hitungSaldo())
+            );
+        });
+
+        // ==========================
+        // LIHAT TRANSAKSI
+        // ==========================
+
+        tombolTransaksi.setOnAction(e -> {
+
+            if (transaksi.isEmpty()) {
+
+                tampilkanAlert(
+                        AlertType.INFORMATION,
+                        "Daftar Transaksi",
+                        "Belum ada transaksi."
+                );
+
+                return;
+            }
+
+            String daftar = "";
+
+            for (Transaksi t : transaksi) {
+
+                String jenis;
+
+                if (t instanceof Pemasukan) {
+                    jenis = "Pemasukan";
+                } else {
+                    jenis = "Pengeluaran";
+                }
+
+                daftar +=
+                        "-------------------------\n"
+                        + "Jenis      : " + jenis + "\n"
+                        + "Nominal    : "
+                        + formatRupiah(t.getNominal()) + "\n"
+                        + "Tanggal    : "
+                        + t.getTanggal() + "\n"
+                        + "Keterangan : "
+                        + t.getKeterangan() + "\n";
+            }
+
+            tampilkanAlert(
+                    AlertType.INFORMATION,
+                    "Daftar Transaksi",
+                    daftar
+            );
+        });
+
+        // ==========================
+        // LAYOUT GRIDPANE
+        // ==========================
+
+        GridPane grid = new GridPane();
+
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(15));
+
+        grid.add(judul, 0, 0, 2, 1);
+
+        grid.add(labelNominal, 0, 1);
+        grid.add(inputNominal, 1, 1);
+
+        grid.add(labelTanggal, 0, 2);
+        grid.add(inputTanggal, 1, 2);
+
+        grid.add(labelKeterangan, 0, 3);
+        grid.add(inputKeterangan, 1, 3);
+
+        HBox tombolInput =
+                new HBox(
+                        10,
+                        tombolPemasukan,
+                        tombolPengeluaran
+                );
+
+        grid.add(tombolInput, 1, 4);
+
+        grid.add(labelSaldo, 0, 5, 2, 1);
+
+        HBox tombolMenu =
+                new HBox(
+                        10,
+                        tombolSaldo,
+                        tombolTransaksi
+                );
+
+        grid.add(tombolMenu, 1, 6);
+
+        // ==========================
+        // SCENE
+        // ==========================
+
+        Scene scene =
+                new Scene(grid, 400, 300);
+
+        stage.setTitle("SakuMahasiswa");
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
+    }
+
+    // ==========================
+    // HITUNG SALDO
+    // ==========================
+
+    private double hitungSaldo() {
+
+        double totalPemasukan = 0;
+        double totalPengeluaran = 0;
+
+        for (Transaksi t : transaksi) {
+
+            if (t instanceof Pemasukan) {
+                totalPemasukan += t.getNominal();
+            } else {
+                totalPengeluaran += t.getNominal();
+            }
+        }
+
+        return totalPemasukan - totalPengeluaran;
+    }
+
+    // ==========================
+    // FORMAT RUPIAH
+    // ==========================
+
+    private String formatRupiah(double nominal) {
+
+        NumberFormat format =
+                NumberFormat.getNumberInstance(
+                        new Locale("id", "ID")
+                );
+
+        format.setMaximumFractionDigits(0);
+
+        return "Rp" + format.format(nominal);
+    }
+
+    // ==========================
+    // UPDATE SALDO
+    // ==========================
+
+    private void updateSaldo() {
+
+        labelSaldo.setText(
+                "Saldo: " + formatRupiah(hitungSaldo())
+        );
+    }
+
+    // ==========================
+    // KOSONGKAN INPUT
+    // ==========================
+
+    private void kosongkanInput() {
+
+        inputNominal.clear();
+        inputTanggal.setValue(null);
+        inputKeterangan.clear();
+    }
+
+    // ==========================
+    // ALERT
+    // ==========================
+
+    private void tampilkanAlert(
+            AlertType tipe,
+            String judul,
+            String pesan) {
+
+        Alert alert = new Alert(tipe);
+
+        alert.setTitle(judul);
+        alert.setHeaderText(null);
+        alert.setContentText(pesan);
+
+        alert.showAndWait();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }
